@@ -44,6 +44,10 @@ hugo new posts/my-post/index.md    # 有附圖的文章（page bundle）
 - **附圖別命名為 `cover` 或 `feature`**：Congo 會用這兩個關鍵字自動抓成
   featured image 顯示在標題下方，跟內文的引用撞在一起會同一張圖出現兩次。
 
+### 留言功能
+
+沒有，而且是刻意的。舊站的 Disqus 沒有跟著遷移，也沒有換成 giscus。
+
 ## 本機預覽
 
 ```bash

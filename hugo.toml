@@ -106,6 +106,8 @@ buildFuture = true
     showTableOfContents = true
     showTaxonomies = true
     showWordCount = false
+    # 刻意不提供留言功能。舊站的 Disqus 沒有跟著遷移過來，
+    # 也不打算換成 giscus 之類的替代方案。
     showComments = false
 
   [params.list]
