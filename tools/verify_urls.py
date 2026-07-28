@@ -71,14 +71,17 @@ def main():
             print(f"  {u}  <- {expected[u]}")
 
     if extra:
-        print(f"\n⚠️  多出（新站有但舊站沒有）：{len(extra)} 筆")
+        # 遷移後新寫的文章本來就會出現在這裡，屬於正常情況，只列出來當資訊。
+        # 真正該擋下的是舊網址消失，那才會造成 404。
+        print(f"\n新增（舊站沒有的網址，遷移後的新文章）：{len(extra)} 筆")
         for u in extra:
-            print(f"  {u}")
+            print(f"  + {u}")
 
-    if not missing and not extra:
-        print("\n✅ 完全一致，所有文章網址都對得起來")
-        return 0
-    return 1
+    if missing:
+        return 1
+
+    print("\n✅ 舊網址全數對得上，沒有任何一篇會 404")
+    return 0
 
 
 if __name__ == "__main__":

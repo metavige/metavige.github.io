@@ -110,9 +110,17 @@ def main():
     if not SRC.is_dir():
         sys.exit(f"找不到來源目錄：{SRC}")
 
-    if DST.exists():
-        shutil.rmtree(DST)
-    DST.mkdir(parents=True)
+    DST.mkdir(parents=True, exist_ok=True)
+
+    # 只清掉這支腳本自己會重新產生的項目，不動 content/posts 底下的其他東西。
+    # 遷移完成後在 Hugo 這邊直接新增的文章，不該被重跑腳本刪掉。
+    for md in SRC.glob("*.md"):
+        stale_bundle = DST / md.stem
+        stale_file = DST / f"{md.stem}.md"
+        if stale_bundle.is_dir():
+            shutil.rmtree(stale_bundle)
+        if stale_file.is_file():
+            stale_file.unlink()
 
     titles = collect_titles()
     posts = sorted(SRC.glob("*.md"))
