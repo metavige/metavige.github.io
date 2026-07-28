@@ -55,7 +55,7 @@ gulp.task('default', ['build']);
 因為我自己寫程式的過程，以及看同事在執行 .Net 專案的作法，大多數時間都是在等待編譯  
 這些時間其實都很浪費  
 
-要加速開發，這只是一個小動作而已，網路上找到的[文章]((http://www.mikeobrien.net/blog/using-gulp-to-build-and-deploy-dotnet-apps-on-windows/))，是可以在搭配更多 Task 來做測試、改變版本號等自動化動作  
+要加速開發，這只是一個小動作而已，網路上找到的[文章](http://www.mikeobrien.net/blog/using-gulp-to-build-and-deploy-dotnet-apps-on-windows/)，是可以在搭配更多 Task 來做測試、改變版本號等自動化動作  
 但是這還需要些時間來整合，這邊只是簡單的改變 build 的部分  
 
 ### Reference
