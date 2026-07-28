@@ -6,3 +6,7 @@ node_modules/
 public/
 .deploy*/
 .vscode
+
+# Hugo
+resources/_gen/
+.hugo_build.lock

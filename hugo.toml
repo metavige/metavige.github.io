@@ -1,0 +1,136 @@
+baseURL = 'https://metavige.github.io/'
+title = '@metavige'
+theme = 'congo'
+
+# 用 zh-Hant 當語言鍵，Congo 的介面翻譯檔才會命中 themes/congo/i18n/zh-Hant.yaml，
+# 否則會靜默 fallback 成英文介面。HTML 的 lang 屬性由下面的 locale 指定為 zh-TW。
+defaultContentLanguage = 'zh-Hant'
+
+# 舊文章的 date 未帶時區，必須以台北時間解析，
+# 否則會被當成 UTC 而讓 permalink 的日期位移一天。
+timeZone = 'Asia/Taipei'
+
+# Hugo 預設會把網址轉小寫，但 Hexo 舊網址保留了檔名的大小寫
+# （如 /2015/12/30/First-Electron-App/）。GitHub Pages 的路徑大小寫敏感，
+# 不關掉這個轉換就會讓那幾篇舊連結變 404。
+disablePathToLower = true
+
+enableRobotsTXT = true
+enableEmoji = true
+buildDrafts = false
+buildFuture = true
+
+# 對齊 Hexo 舊網址 :year/:month/:day/:title/
+# Hexo 的 :title 取的是檔名，遷移時已把它寫進每篇的 slug 欄位，
+# 這裡用 :slug 就能鎖定網址，不受 page bundle 的檔名推導影響。
+[permalinks]
+  posts = '/:year/:month/:day/:slug/'
+
+# 對齊 Hexo 的 per_page: 5。改成別的數字會讓舊的 /page/6/ ~ /page/10/ 變 404。
+[pagination]
+  pagerSize = 5
+
+[taxonomies]
+  tag = 'tags'
+  category = 'categories'
+
+# Congo 的站內搜尋靠首頁的 JSON 索引，缺了它 header 的搜尋會沒有資料。
+[outputs]
+  home = ['HTML', 'RSS', 'JSON']
+
+# 舊站的訂閱網址是 /atom.xml（Hexo 的 hexo-generator-feed），
+# Hugo 預設會輸出成 /index.xml。不改名的話所有 RSS 訂閱者都會 404。
+[outputFormats]
+  [outputFormats.RSS]
+    mediaType = 'application/rss+xml'
+    baseName = 'atom'
+
+[languages]
+  [languages.zh-Hant]
+    locale = 'zh-TW'
+    label = '正體中文'
+    weight = 1
+
+[markup]
+  [markup.highlight]
+    style = 'github-dark'
+    lineNos = true
+    lineNumbersInTable = true
+    noClasses = true
+    codeFences = true
+  [markup.goldmark.renderer]
+    unsafe = true
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 4
+
+[params]
+  colorScheme = 'ocean'
+  defaultAppearance = 'auto'
+  autoSwitchAppearance = true
+  enableSearch = true
+  enableCodeCopy = true
+  enableImageLazyLoading = true
+  description = '生命會自己找到出路，程式 Bug 不會自己修復，孩子～'
+  mainSections = ['posts']
+
+  [params.author]
+    name = 'metavige (Ricky Chiang)'
+    links = [{ github = 'https://github.com/metavige' }]
+
+  [params.header]
+    layout = 'basic'
+    showTitle = true
+
+  [params.footer]
+    showCopyright = true
+    showThemeAttribution = true
+    showAppearanceSwitcher = true
+    showScrollToTop = true
+
+  [params.homepage]
+    layout = 'profile'
+    showRecent = true
+    # 對齊 Hexo 首頁的 per_page: 5，讓首頁分頁同樣是 10 頁，
+    # 舊的 /page/6/ ~ /page/10/ 才不會變 404。
+    recentLimit = 5
+
+  [params.article]
+    showDate = true
+    showAuthor = false
+    showBreadcrumbs = true
+    showHeadingAnchors = true
+    showPagination = true
+    showReadingTime = true
+    # 這是你要的側邊固定目錄
+    showTableOfContents = true
+    showTaxonomies = true
+    showWordCount = false
+    showComments = false
+
+  [params.list]
+    showBreadcrumbs = true
+    showSummary = true
+
+  [params.taxonomy]
+    showTermCount = true
+
+# Congo 沒有內建 archives layout，文章總覽改用 section 列表頁 /posts/。
+# 搜尋不需要選單項，Congo 會在 header 放搜尋圖示。
+[[menu.main]]
+  identifier = 'posts'
+  name = '文章'
+  pageRef = '/posts'
+  weight = 10
+
+[[menu.main]]
+  identifier = 'categories'
+  name = '分類'
+  pageRef = '/categories'
+  weight = 20
+
+[[menu.main]]
+  identifier = 'tags'
+  name = '標籤'
+  pageRef = '/tags'
+  weight = 30
