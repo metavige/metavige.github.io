@@ -5,7 +5,7 @@
 透過 GitHub Actions 自動部署到 GitHub Pages。
 
 - 網站：<https://metavige.github.io>
-- 原始檔分支：`pages-src`（推上去就會自動部署）
+- 分支：`master`（唯一分支，推上去就會自動部署）
 
 ## 環境需求
 
@@ -57,12 +57,16 @@ hugo server -D     # 連草稿一起看
 
 ## 部署
 
-推到 `pages-src` 就會觸發 `.github/workflows/hugo.yml`，
+推到 `master` 就會觸發 `.github/workflows/hugo.yml`，
 建置後由 `actions/deploy-pages` 直接發佈，不經過任何發布分支。
 
 ```bash
-git push origin pages-src
+git push origin master
 ```
+
+這個 repo 只有 `master` 一個分支。以前 `master` 放建置產物、`pages-src` 放原始檔，
+改用官方 Pages Actions 之後產物走 artifact，發布分支就沒有存在的必要了。
+舊的 Hexo 站產物保存在 `hexo-legacy-site` tag。
 
 ## 舊網址保護
 

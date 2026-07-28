@@ -3,8 +3,8 @@ name: Deploy Hugo site to Pages
 on:
   push:
     branches:
-      - pages-src
-  # 允許在 Actions 頁面手動觸發（遷移期間方便驗證）
+      - master
+  # 允許在 Actions 頁面手動觸發
   workflow_dispatch:
 
 # 官方 Pages 部署所需的最小權限
