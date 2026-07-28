@@ -115,6 +115,12 @@ buildFuture = true
   [params.taxonomy]
     showTermCount = true
 
+  # Congo 預設把 taxonomy/term 排除在 sitemap 之外，但舊站的 sitemap
+  # 有宣告全部的 tags 與 categories 頁（38 個）。清空這個清單以維持一致，
+  # 避免既有索引失去 sitemap 支撐。
+  [params.sitemap]
+    excludedKinds = []
+
 # Congo 沒有內建 archives layout，文章總覽改用 section 列表頁 /posts/。
 # 搜尋不需要選單項，Congo 會在 header 放搜尋圖示。
 [[menu.main]]
