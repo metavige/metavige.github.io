@@ -1,86 +1,64 @@
 #!/usr/bin/env python3
-"""比對 Hugo 產出的文章網址是否與 Hexo 舊網址完全一致。
+"""確認從 Hexo 遷移過來的舊網址都還活著。
 
-舊網址規則來自 Hexo 的 permalink 設定 `:year/:month/:day/:title/`，
-其中 :title 取的是原始檔名，日期取自 front-matter 的 date。
+基準是 tools/legacy-urls.txt——一份在遷移當下凍結的快照，記錄了
+所有「必須永遠可存取」的路徑：49 篇舊文章、archives 年月封存頁、
+RSS，以及靠 alias 接住的 /tags/CSharp/。
 
-用法：先跑 `hugo`，再跑本腳本。
+這些路徑一旦消失，既有的外部連結、書籤與搜尋結果就會變成 404，
+所以 CI 每次建置都會跑這支檢查。
+
+新增文章不需要動 legacy-urls.txt——這份清單只管舊網址不要斷，
+不管新增了什麼。
+
+用法：先跑 hugo，再跑本腳本。
 """
 
-import re
 import sys
-import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "source" / "_posts"
-SITEMAP = ROOT / "public" / "sitemap.xml"
-
-DATE_RE = re.compile(r"^date:\s*(\d{4})-(\d{2})-(\d{2})")
+SNAPSHOT = ROOT / "tools" / "legacy-urls.txt"
+PUBLIC = ROOT / "public"
 
 
-def expected_urls():
-    """從 Hexo 原始檔推導出舊網址。"""
-    urls = {}
-    for md in sorted(SRC.glob("*.md")):
-        for line in md.read_text(encoding="utf-8").split("\n"):
-            m = DATE_RE.match(line)
-            if m:
-                y, mo, d = m.groups()
-                urls[f"/{y}/{mo}/{d}/{md.stem}/"] = md.name
-                break
-        else:
-            print(f"  ! {md.name} 找不到 date 欄位")
+def load_snapshot():
+    if not SNAPSHOT.is_file():
+        sys.exit(f"找不到基準快照：{SNAPSHOT}")
+    urls = []
+    for line in SNAPSHOT.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line and not line.startswith("#"):
+            urls.append(line)
     return urls
 
 
-def actual_urls():
-    """從 Hugo 產出的 sitemap 取出實際網址。"""
-    if not SITEMAP.is_file():
-        sys.exit(f"找不到 {SITEMAP}，請先執行 hugo")
-
-    ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
-    tree = ET.parse(SITEMAP)
-    found = set()
-    for loc in tree.iterfind(".//sm:url/sm:loc", ns):
-        path = re.sub(r"^https?://[^/]+", "", loc.text)
-        # 只看形如 /YYYY/MM/DD/slug/ 的文章網址
-        if re.fullmatch(r"/\d{4}/\d{2}/\d{2}/[^/]+/", path):
-            found.add(path)
-    return found
+def resolve(url: str) -> bool:
+    """檢查這個網址在 public/ 裡有沒有對應的實體檔案。"""
+    target = PUBLIC / url.lstrip("/")
+    if target.is_file():
+        return True
+    # 目錄形式的網址，實際檔案是底下的 index.html
+    return (target / "index.html").is_file()
 
 
 def main():
-    # Hexo 來源清掉之後就沒有比對基準了，這時直接跳過而不是讓 CI 失敗
-    if not SRC.is_dir():
-        print(f"找不到 {SRC}，Hexo 來源已移除，跳過網址比對")
-        return 0
+    if not PUBLIC.is_dir():
+        sys.exit(f"找不到 {PUBLIC}，請先執行 hugo")
 
-    expected = expected_urls()
-    actual = actual_urls()
+    urls = load_snapshot()
+    missing = [u for u in urls if not resolve(u)]
 
-    missing = sorted(set(expected) - actual)
-    extra = sorted(actual - set(expected))
-
-    print(f"Hexo 舊網址：{len(expected)} 筆")
-    print(f"Hugo 新網址：{len(actual)} 筆")
+    print(f"檢查 {len(urls)} 個必須保留的舊網址")
 
     if missing:
-        print(f"\n❌ 遺失（舊網址在新站找不到，會產生 404）：{len(missing)} 筆")
+        print(f"\n❌ 以下舊網址在新站找不到，上線後會變成 404：{len(missing)} 筆")
         for u in missing:
-            print(f"  {u}  <- {expected[u]}")
-
-    if extra:
-        # 遷移後新寫的文章本來就會出現在這裡，屬於正常情況，只列出來當資訊。
-        # 真正該擋下的是舊網址消失，那才會造成 404。
-        print(f"\n新增（舊站沒有的網址，遷移後的新文章）：{len(extra)} 筆")
-        for u in extra:
-            print(f"  + {u}")
-
-    if missing:
+            print(f"  {u}")
+        print("\n這通常表示某篇文章的 slug、date 或 alias 被改動了。")
         return 1
 
-    print("\n✅ 舊網址全數對得上，沒有任何一篇會 404")
+    print("✅ 全部都在，沒有任何舊連結會斷")
     return 0
 
 
