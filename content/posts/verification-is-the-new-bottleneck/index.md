@@ -3,7 +3,7 @@ title: "當修改變便宜，驗證變昂貴：AI 時代的工作新思維"
 date: 2026-07-28 19:45:00
 slug: "verification-is-the-new-bottleneck"
 tags:
-- ai
+- AI
 - ai-agent
 - prompt
 - skill
