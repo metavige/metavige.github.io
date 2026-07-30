@@ -1,8 +1,8 @@
 ---
-title: "AI Agent Sandbox 深度解析"
+title: "當 AI 開始操作你的 Terminal，我們需要重新思考 Sandbox"
 date: 2026-07-30 20:40:00
 slug: "ai-agent-sandbox"
-description: "從 Docker Sandbox、OrbStack 到 AI 開發環境的未來"
+description: "從 Docker Sandbox、OrbStack 到 AI Agent 執行環境的設計思維"
 tags:
 - AI
 - ai-agent
@@ -13,380 +13,154 @@ categories:
 - 程式開發
 ---
 
-> AI Agent 已經從「回答問題」進化成「執行工作」。當 AI 開始擁有修改程式碼、執行 Terminal、操作 Git、呼叫 API 的能力時，如何建立一個**安全、可控、可重建**的執行環境，就成為新的工程議題。
+> 從 Docker Sandbox、OrbStack 到 AI Agent 執行環境的設計思維
 
 ## 前言
 
-近幾年，大型語言模型（LLM）快速發展。
+過去幾年，大型語言模型（LLM）快速發展。最初的 AI 工具主要扮演「助手（Assistant）」的角色，協助撰寫程式、回答問題，真正執行的人仍然是開發者。
 
-一開始，我們只是把 ChatGPT 當作聊天機器人。
+然而，這個模式正在改變。
 
-現在則逐漸變成：
+<!--more-->
 
-* Claude Code
-* Codex CLI
-* Gemini CLI
-* OpenAI Codex Agent
-* 各種 AI Coding Assistant
+近一年，Claude Code、Codex CLI、Gemini CLI，以及各種 AI Agent 開始具備直接操作 Terminal 的能力。它們可以修改程式碼、執行測試、操作 Git、啟動 Docker，甚至完成整個開發流程。
 
-它們已經可以：
+AI 已經不只是提供建議，而是真正開始「執行工作」。
 
-* 修改程式碼
-* 執行 Terminal
-* 執行 Build
-* 執行 Test
-* 操作 Git
-* 呼叫 API
-* 使用 MCP Server
-* 自動完成整個開發流程
+這也帶來一個新的問題：
 
-也因此，一個新的問題開始浮現：
+> **如果 AI 擁有和工程師一樣的權限，它到底能做到多少事情？**
 
-> **如果 AI 擁有和開發者相同的權限，它到底能做到多少事情？**
+## AI Agent 的權限，其實就是你的權限
 
-這也是 Docker 最近推出 **Docker Sandbox** 的原因。
+當 AI 透過 Terminal 工作時，它通常繼承目前使用者的權限。
 
-## AI Agent 面臨的安全問題
+如果你的帳號可以執行：
 
-傳統上，我們直接在自己的電腦執行 AI Agent：
-
-```
-Mac / Windows
-        │
-        ▼
-Claude Code
-Codex CLI
-Gemini CLI
-```
-
-AI 通常會透過 Terminal 執行。
-
-因此，它的權限通常等同於目前登入的使用者。
-
-如果你的帳號可以：
-
-```
+```bash
 git push
-kubectl delete
-aws s3 rm
-rm -rf
+kubectl delete namespace production
+aws s3 rm --recursive
 ```
 
-理論上 AI 也可能做到。
+那麼 AI 理論上也可能執行這些指令。
 
-除此之外，它還可能看到：
+除此之外，它還可能讀取：
 
-* SSH Keys
-* API Keys
-* AWS Credentials
-* Azure Credentials
-* Git Token
-* Documents
-* Downloads
-* Environment Variables
+- SSH Key
+- Git Credential
+- API Token
+- Environment Variables
+- Documents
+- Downloads
 
-這代表：
+因此，我們真正需要思考的不是「AI 會不會犯錯」，而是「AI 犯錯時，最多能造成多大的影響」。
 
-> AI 能存取的範圍，通常就是你的使用者能存取的範圍。
+## 為什麼只靠 Permission 還不夠？
 
-## 傳統 Permission 真的夠嗎？
-
-很多人第一個想法是：
-
-> 「設定權限不就好了？」
-
-這沒有錯。
-
-但這些限制，大多屬於：
-
-* Prompt 規則
-* Tool Permission
-* 設定檔
-* Agent Policy
-
-它們都是**應用程式層級（Application Layer）**的限制。
-
-如果：
-
-* Prompt Injection
-* Tool Injection
-* Framework Bug
-* Runtime 漏洞
-
-都有可能造成權限被繞過。
-
-因此資訊安全一直有一句話：
-
-> **Don't trust. Isolate.**
-
-不要相信程式一定會遵守規則。
-
-而是讓它根本沒有能力做那些事情。
-
-## Sandbox 的核心概念
-
-Sandbox 的目的不是：
-
-> **禁止 AI。**
-
-而是：
-
-> **限制 AI 能夠接觸的世界。**
+很多工具都提供了 Permission 或 Policy。
 
 例如：
 
-```
-Host Machine
-│
-├── Documents
-├── SSH Keys
-├── Downloads
-├── API Keys
-│
-└── Sandbox
-      │
-      ├── Project
-      ├── Build Tool
-      ├── AI Agent
-      └── Test Environment
-```
+- 是否允許執行 Shell
+- 是否允許修改檔案
+- 是否允許使用某個 Tool
 
-AI 永遠只能看到：
+這些限制很重要，但它們仍屬於**應用程式層**。
 
-```
-Project
-```
+如果遇到 Prompt Injection、工具漏洞或框架缺陷，仍有可能突破這些限制。
 
-而不是整台電腦。
+資訊安全有一句經典原則：
 
-## Docker Sandbox
+> **Don't trust. Isolate.**
 
-Docker 最近提出的 Sandbox，並不是新的 Container 技術。
+真正有效的方式，不是相信程式一定會遵守規則，而是讓它根本沒有能力碰到不該碰的資源。
 
-真正的新概念是：
+## Sandbox 的核心設計理念
 
-> **Container 不只是部署工具，而是 AI 的工作空間（Workspace）。**
+Sandbox 並不是禁止 AI，而是替 AI 建立一個邊界。
 
-Docker Sandbox 提供：
+AI 可以自由工作，但只能在被允許的空間內。
 
-* AI Workspace
-* Secret Injection
-* Network Policy
-* Filesystem Isolation
-* Resource Limit
-* AI Agent 整合
-* Disposable Environment
+可限制的範圍包括：
 
-它的目的，就是讓 AI：
+- 檔案系統（Filesystem）
+- 網路（Network）
+- CPU / Memory / Disk
+- Secret 與 Credential
+- 最小權限（Least Privilege）
 
-> **只能工作在被允許的環境內。**
+即使 AI 發生錯誤，影響也會被限制在 Sandbox 中。
 
-## Sandbox 可以控制哪些東西？
+## Docker Sandbox：把 Container 變成 AI Workspace
 
-### 1. Filesystem
+Docker Sandbox 並不是重新發明 Container，而是重新定義 Container 的用途。
 
-限制 AI：
+Container 不再只是部署應用程式，而是 AI Agent 的工作空間（Workspace）。
 
-* 只能看到指定 Repository
-* 無法讀取 Documents
-* 無法讀取 SSH Key
-* 無法讀取 Downloads
+Docker 會協助建立隔離環境、管理 Secret、限制網路與資源，並與 AI Agent 整合，讓每個專案都能擁有一個可重建、可銷毀且安全的執行環境。
 
-### 2. Network
+## OrbStack 呢？
 
-可以限制：
+OrbStack 並沒有提供 Docker Sandbox 那樣完整的 AI Sandbox 功能。
 
-* 完全離線
-* 僅允許 GitHub
-* 僅允許公司 Registry
-* Network 白名單
+它的定位仍然是：
 
-避免資料外洩。
+- 高效能 Docker Runtime
+- Linux VM
+- Kubernetes 開發環境
 
-### 3. Resource
+不過，這並不代表它不能建立 Sandbox。
 
-限制：
+許多工程師會採用「每個專案一台 Linux VM」的方式：
 
-* CPU
-* RAM
-* Disk
-
-避免：
-
-* 無限 Build
-* 無限 Loop
-* 吃滿主機資源
-
-### 4. Secret
-
-只注入：
-
-* Git Token
-* OpenAI API Key
-
-不提供：
-
-* AWS Secret
-* SSH Key
-* Azure Credential
-
-### 5. Least Privilege
-
-遵循：
-
-> **只給完成工作需要的最低權限。**
-
-## OrbStack 可以做到嗎？
-
-答案是：
-
-**可以，但定位不同。**
-
-OrbStack 並沒有提供 Docker Sandbox 那種官方 AI Sandbox 功能。
-
-它提供的是：
-
-* Linux VM
-* Docker
-* Kubernetes
-* 快速檔案共享（VirtioFS）
-
-因此可以自行建立：
-
-```
+```text
 Mac Host
-        │
-        ▼
-OrbStack Linux VM
-        │
- ├── Claude Code
- ├── Codex CLI
- ├── Gemini CLI
- ├── Docker
- └── Git Repository
+└── OrbStack Linux VM
+    ├── Claude Code
+    ├── Codex CLI
+    ├── Docker
+    └── Git Repository
 ```
 
-AI 完全在 VM 中工作。
+AI 完全在 VM 中工作，而 Host 不共享 SSH Key、私人文件與敏感憑證。
 
-Host：
-
-* 不共享 SSH Key
-* 不掛載 Documents
-* 不暴露 Password
-
-就能達到接近 Sandbox 的效果。
+雖然需要自行管理，但設計理念與 Docker Sandbox 十分接近。
 
 ## Docker Sandbox vs OrbStack
 
-| 項目                   | Docker Sandbox | OrbStack            |
-| -------------------- | -------------- | ------------------- |
-| 定位                   | AI Sandbox 平台  | Linux VM 平台         |
-| Container            | ✅              | ✅                   |
-| Linux VM             | ❌              | ✅                   |
-| AI Agent 整合          | ✅              | ❌                   |
-| Secret 管理            | ✅              | 自行管理                |
-| Network Policy       | ✅              | 自行設定                |
-| Disposable Workspace | ✅              | 可透過 VM 實現           |
-| 適合對象                 | AI 開發流程        | 熟悉 Docker / VM 的工程師 |
+Docker Sandbox 偏向官方提供的一體化 AI Sandbox 平台，整合 Agent、Secret、網路與生命週期管理。
 
-## 如何選擇？
+OrbStack 則提供彈性的 Linux VM，由開發者自行建立隔離環境。
 
-### Docker Sandbox
+如果你希望快速導入 AI Sandbox，Docker Sandbox 會比較方便。
 
-適合：
+如果你已經熟悉 Docker、Linux VM 與 DevOps，OrbStack 則提供更高的自由度。
 
-* 想快速開始 AI Sandbox
-* 官方支援 AI Agent
-* 重視一致性的團隊
-* 希望與 AI 工具深度整合
+## Kubernetes 工程師會很熟悉
 
-### OrbStack
+如果平常使用 Kubernetes，你會發現許多概念幾乎一致：
 
-適合：
+| Kubernetes | AI Sandbox |
+| --- | --- |
+| Pod | AI Workspace |
+| Secret | Secret Injection |
+| Resource Limit | CPU / RAM Limit |
+| Network Policy | Network Restriction |
+| Security Context | Least Privilege |
 
-* 已經使用 OrbStack
-* 熟悉 Docker
-* 熟悉 Linux VM
-* 希望完全掌控環境
-* 想自行打造 AI Sandbox
+可以說，Docker Sandbox 是把 Kubernetes 的隔離思維延伸到 AI 開發流程。
 
-## 最佳實務
+## 結語
 
-建議每個 Repository 建立獨立 Sandbox：
+AI Agent 的能力仍在快速成長。
 
-```
-Repository
-      │
-      ▼
- Sandbox / VM
-      │
-      ▼
- AI Agent
-      │
- Build
- Test
- Commit
-```
+今天它只是修改程式碼，明天可能就會協助部署、維運，甚至操作整個開發流程。
 
-並遵循以下原則：
+因此，我們需要重新思考的不只是 AI 的能力，而是 AI 的執行環境。
 
-* 每個專案一個 Sandbox
-* 最小權限（Least Privilege）
-* Secret 最小化
-* Network 白名單
-* 唯讀 Mount
-* Disposable Environment
-* 可快速重建
+Sandbox 的價值，不在於限制 AI，而是在於建立一個即使 AI 出錯，也能將影響控制在預期範圍內的安全邊界。
 
-## Docker Sandbox 與 Kubernetes 的共同理念
-
-如果你熟悉 Kubernetes，你會發現很多概念非常相似：
-
-| Kubernetes       | AI Sandbox          |
-| ---------------- | ------------------- |
-| Pod              | AI Workspace        |
-| Namespace        | Project Isolation   |
-| Resource Limit   | CPU / RAM Limit     |
-| Secret           | Secret Injection    |
-| Network Policy   | Network Restriction |
-| ReadOnly RootFS  | ReadOnly Workspace  |
-| Security Context | Least Privilege     |
-
-可以說，Docker Sandbox 是把 Kubernetes 的隔離思維，帶到了 AI 開發流程。
-
-## 未來的 AI 開發模式
-
-未來，一個典型的開發流程可能會是：
-
-```
-Git Repository
-        │
-        ▼
-建立 Sandbox / VM
-        │
-        ▼
-AI Agent
-        │
- ├── 修改程式
- ├── Build
- ├── Test
- ├── Code Review
- └── Commit
-        │
-        ▼
-CI/CD
-```
-
-AI 不再直接操作開發者的電腦，而是在一個可控、可重建的工作空間中完成所有任務。
-
-## 結論
-
-Docker Sandbox 並不是單純的新功能，而是一種新的安全思維。
-
-真正重要的，不是限制 AI「應該做什麼」，而是透過底層隔離，讓 AI **只能做到被允許的事情**。
-
-對於已經使用 Docker 生態系的團隊，Docker Sandbox 提供了官方整合的 AI Workspace；而對熟悉 OrbStack 的工程師來說，也能利用 Linux VM 建立隔離環境，打造屬於自己的 AI Sandbox。
-
-隨著 AI Agent 能力持續提升，「每個專案一個隔離工作空間」很可能會成為未來 AI 開發的標準模式，而安全、可控、可重建，也將成為 AI 開發環境的重要設計原則。
+未來，「每個 Repository 一個 Sandbox」很可能會像今天的 Git Branch 或 Docker Container 一樣，成為 AI 開發的基本配置。
 
 ![LLM 執行環境：傳統方式 vs Docker Sandbox vs OrbStack——安全、隔離與可控性的完整比較](sandbox-comparison.png)
