@@ -2,6 +2,11 @@
 title: "AI 工具一直在變，真正值得建立的是自己的 Workflow"
 date: 2026-07-30 21:30:00
 slug: "build-your-own-workflow"
+# 給社群分享的 og:image 用（FB/Twitter 連結預覽卡）。
+# 圖片檔名刻意不用 feature/cover，所以要靠這個參數指定，
+# 這樣頁面內不會重複顯示，但分享連結時有縮圖。
+images:
+- "infographic.png"
 tags:
 - AI
 - ai-agent
