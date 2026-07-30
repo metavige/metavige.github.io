@@ -30,15 +30,7 @@ categories:
 十幾年前，開發流程可能很單純：
 
 ```
-需求
-  ↓
-設計
-  ↓
-開發
-  ↓
-測試
-  ↓
-交付
+需求 → 設計 → 開發 → 測試 → 交付
 ```
 
 隨著系統越來越大型，開始出現 Scrum、Sprint、Story Point、Stand-up Meeting、Retrospective……
@@ -126,21 +118,7 @@ AI 很擅長完成小而明確的任務，卻不擅長一次完成大型系統�
 Kanban 也是同樣的概念。
 
 ```
-Todo
-   ↓
-Analysis
-   ↓
-Design
-   ↓
-Coding
-   ↓
-Review
-   ↓
-Testing
-   ↓
-Deploy
-   ↓
-Done
+Todo → Analysis → Design → Coding → Review → Testing → Deploy → Done
 ```
 
 AI 加入之後，流程沒有消失。
