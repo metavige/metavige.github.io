@@ -1,6 +1,6 @@
 ---
-status: draft
-capabilities: []
+status: planned
+capabilities: [blog-publishing]
 created: "2026-08-08"
 ---
 
