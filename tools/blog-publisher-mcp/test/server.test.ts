@@ -1,8 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { mkdtempSync, mkdirSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Client } from '@modelcontextprotocol/client';
-import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
+import { StdioClientTransport, getDefaultEnvironment } from '@modelcontextprotocol/client/stdio';
 
 const serverEntry = fileURLToPath(new URL('../src/index.ts', import.meta.url));
 const tsxCli = fileURLToPath(
@@ -10,10 +13,14 @@ const tsxCli = fileURLToPath(
 );
 
 async function connect() {
+  // 隔離：server 指向暫存目錄，測試絕不觸碰真實 blog repo
+  const repoDir = mkdtempSync(join(tmpdir(), 'blog-publisher-server-'));
+  mkdirSync(join(repoDir, 'content', 'posts'), { recursive: true });
   const client = new Client({ name: 'server-test', version: '0.0.0' });
   const transport = new StdioClientTransport({
     command: process.execPath,
     args: [tsxCli, serverEntry],
+    env: { ...getDefaultEnvironment(), BLOG_REPO_DIR: repoDir },
   });
   await client.connect(transport);
   return client;
@@ -30,20 +37,20 @@ test('stdio server 啟動後 tools/list 含 publish_post', async () => {
   }
 });
 
-test('publish_post 骨架回傳未實作錯誤', async () => {
+test('publish_post 經 stdio 呼叫：非法 slug 回 E-SLUG-INVALID', async () => {
   const client = await connect();
   try {
     const result = await client.callTool({
       name: 'publish_post',
       arguments: {
         title: '測試',
-        slug: 'test-post',
+        slug: 'Bad_Slug',
         content: 'hello',
       },
     });
     assert.equal(result.isError, true);
     const text = result.content?.find((c: { type: string }) => c.type === 'text');
-    assert.match((text as { text: string }).text, /E-NOT-IMPLEMENTED/);
+    assert.match((text as { text: string }).text, /E-SLUG-INVALID/);
   } finally {
     await client.close();
   }

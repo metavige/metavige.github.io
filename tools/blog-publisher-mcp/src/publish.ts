@@ -48,6 +48,12 @@ export function renderFrontmatter(params: PublishParams, now: Date): string {
   ].join('\n');
 }
 
+// 預期上線 URL：hugo.toml permalink 規則 /:year/:month/:day/:slug/（PUB-R-06）
+export function expectedUrl(baseUrl: string, slug: string, now: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${baseUrl}/${now.getFullYear()}/${pad(now.getMonth() + 1)}/${pad(now.getDate())}/${slug}/`;
+}
+
 /**
  * 驗證參數並建立 page bundle（PUB-R-02/03/07/08/09）。
  * 驗證全部通過才落任何檔案；驗證失敗時保證零檔案變更。
