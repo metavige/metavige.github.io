@@ -14,7 +14,7 @@
 > ⚠ 拆分邊界：2.1–2.3 皆改 publish 流程同一模組的相鄰區塊——各自獨立 commit，勿一次寫完。
 
 - [x] 2.1 [TDD] 參數驗證與 page bundle 建立（PUB-R-02、R-03、R-07、R-08、R-09）：slug 格式檢查、既存 bundle 檢查、assets 存在檢查、frontmatter 組裝（title/date/slug/tags/categories，date 本機時間 `YYYY-MM-DD HH:MM:SS`）、assets 複製｜驗證：`npm test` 全綠，測試涵蓋 EX-A#2、EX-B#2、EX-C 全列（錯誤時零檔案變更）(blocked-by: 1.3; tier: 同級)
-- [ ] 2.2 [TDD] hugo build 驗證關卡（PUB-R-04、R-10）：bundle 建立後執行本機 hugo build；失敗回 E-BUILD-FAILED 附錯誤輸出、不 commit 不 push、檔案保留供檢查｜驗證：`npm test` 全綠，含 EX-D#1 case（以會使 build 失敗的內容實測）(blocked-by: 2.1; tier: 同級)
+- [x] 2.2 [TDD] hugo build 驗證關卡（PUB-R-04、R-10）：bundle 建立後執行本機 hugo build；失敗回 E-BUILD-FAILED 附錯誤輸出、不 commit 不 push、檔案保留供檢查｜驗證：`npm test` 全綠，含 EX-D#1 case（以會使 build 失敗的內容實測）(blocked-by: 2.1; tier: 同級)
 - [ ] 2.3 [TDD] git commit＋push 與 URL 回傳（PUB-R-05、R-06、R-11）：英文 commit message 沿用 `doc: add new article "<title>"` 慣例、push origin master 禁止 force、成功回傳預期上線 URL（`hugo.toml:27` permalink 規則）；push 被拒回 E-PUSH-REJECTED、本地 commit 保留｜驗證：`npm test` 全綠，git 操作以暫存 repo fixture 測試，含 EX-D#2 non-fast-forward case (blocked-by: 2.2; tier: 同級)
 
 ## 3. 端對端驗收
