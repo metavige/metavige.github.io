@@ -1,5 +1,5 @@
 ---
-status: planned
+status: in-progress
 capabilities: [blog-publishing]
 created: "2026-08-08"
 ---
