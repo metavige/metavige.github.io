@@ -7,7 +7,7 @@
 
 - [x] 1.1 安裝與 CI 同版的 hugo **extended 0.164.0**（`hugo.yml:30` 鎖定；brew 版本不符就改下載官方 release binary 進 PATH），並驗證整站可 build｜驗證：`hugo version` 輸出含 `0.164.0` 與 `extended`；repo 根目錄 `hugo --renderToMemory --quiet` exit 0 (tier: 中階)
 - [x] 1.2 查證 2026 當前最新 MCP spec 版本與官方 TypeScript SDK 最新 stable（官方文件優先：modelcontextprotocol.io 與 SDK repo；**實作前先查官方文件**），把 spec 版號、SDK package 名與版號、stdio server 最小範例出處 URL 記錄到本檔末「查證附註」段｜驗證：「查證附註」段存在且三項齊備、各附出處 URL (tier: 中階)
-- [ ] 1.3 scaffold `tools/blog-publisher-mcp/`：npm + TypeScript + 官方 SDK（版本依 1.2 查證結果鎖定），可啟動的 stdio server 註冊 `publish_post` 工具骨架（暫回未實作錯誤）；repo 根目錄新增 `.mcp.json` 註冊此 server（PUB-R-01）｜驗證：以 stdio 送 JSON-RPC `initialize`＋`tools/list`，回應含 `publish_post`；`npm test` 可執行且綠（骨架測試）(blocked-by: 1.2; tier: 同級)
+- [x] 1.3 scaffold `tools/blog-publisher-mcp/`：npm + TypeScript + 官方 SDK（版本依 1.2 查證結果鎖定），可啟動的 stdio server 註冊 `publish_post` 工具骨架（暫回未實作錯誤）；repo 根目錄新增 `.mcp.json` 註冊此 server（PUB-R-01）｜驗證：以 stdio 送 JSON-RPC `initialize`＋`tools/list`，回應含 `publish_post`；`npm test` 可執行且綠（骨架測試）(blocked-by: 1.2; tier: 同級)
 
 ## 2. 核心行為
 

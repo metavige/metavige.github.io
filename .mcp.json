@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "blog-publisher": {
+      "command": "node",
+      "args": [
+        "tools/blog-publisher-mcp/node_modules/tsx/dist/cli.mjs",
+        "tools/blog-publisher-mcp/src/index.ts"
+      ]
+    }
+  }
+}
