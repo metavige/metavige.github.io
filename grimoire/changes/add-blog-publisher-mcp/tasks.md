@@ -20,7 +20,7 @@
 ## 3. 端對端驗收
 
 - [x] 3.1 Claude Code 註冊實測（PUB-R-01）｜驗證：於 repo 目錄執行 `claude mcp list`，輸出含 blog-publisher-mcp 且狀態為可連線 (blocked-by: 2.3; tier: 最小可用)
-- [ ] 3.2 端對端真發驗證＋下架：透過 MCP client 真呼叫 `publish_post` 發佈測試文章（使用者已核可短暫上線）；再對同 slug 重呼叫實測 EX-C#3｜驗證：`git log -1` 顯示英文 commit；`gh run watch` GitHub Actions 綠；`curl -o /dev/null -s -w '%{http_code}' <文章URL>` 回 200；EX-C#3 回 E-SLUG-EXISTS 且 `git status --porcelain` 乾淨；revert commit 後 push、Actions 綠、文章 URL 回 404；全程 `git diff --stat` 確認既有檔案零改動 (blocked-by: 3.1; tier: 主對話)
+- [x] 3.2 端對端真發驗證＋下架：透過 MCP client 真呼叫 `publish_post` 發佈測試文章（使用者已核可短暫上線）；再對同 slug 重呼叫實測 EX-C#3｜驗證：`git log -1` 顯示英文 commit；`gh run watch` GitHub Actions 綠；`curl -o /dev/null -s -w '%{http_code}' <文章URL>` 回 200；EX-C#3 回 E-SLUG-EXISTS 且 `git status --porcelain` 乾淨；revert commit 後 push、Actions 綠、文章 URL 回 404；全程 `git diff --stat` 確認既有檔案零改動 (blocked-by: 3.1; tier: 主對話)
 
 ## 查證附註（task 1.2，查證於 2026-08-08，主 agent 已抽驗 npm registry 與 spec 版本頁）
 

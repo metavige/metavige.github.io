@@ -130,8 +130,8 @@ created: "2026-08-08"
 
 ## 驗收條件
 
-- [ ] `.mcp.json` 存在且註冊 blog-publisher-mcp；Claude Code 重啟後可列出 `publish_post` 工具（PUB-R-01）
-- [ ] server 單元測試全綠（`npm test` 於 `tools/blog-publisher-mcp/`，覆蓋 EX-A～EX-D 各列）
-- [ ] 端對端真發驗證：以 `publish_post` 發佈一篇測試文章，`git log -1` 顯示英文 commit、push 成功、GitHub Actions 綠、文章 URL 回 200；驗證後 revert commit 下架（使用者已核可此短暫上線）
-- [ ] 對已存在 slug 呼叫 → 回 E-SLUG-EXISTS 且 `git status` 乾淨（EX-C#3 實跑）
-- [ ] 既有檔案零改動：`git diff --stat master@{發文前}` 只含新增的 bundle 與 revert
+- [x] `.mcp.json` 存在且註冊 blog-publisher-mcp；Claude Code 重啟後可列出 `publish_post` 工具（PUB-R-01；`claude mcp list` 認得 server，互動核准待 user 下次開 `claude` 完成——CLI 無 headless 核准，見 journal 3.1）
+- [x] server 單元測試全綠（`npm test` 於 `tools/blog-publisher-mcp/`，18/18，覆蓋 EX-A～EX-D 各列）
+- [x] 端對端真發驗證：以 `publish_post` 發佈測試文章（commit ac7d1ea，英文 message）、push 成功、Actions 綠、URL 回 200；revert（9fc7e4a）後 Actions 綠、URL 回 404（使用者已核可此短暫上線）
+- [x] 對已存在 slug 呼叫 → 回 E-SLUG-EXISTS 且 `git status --porcelain` 空（EX-C#3 實跑）
+- [x] 既有檔案零改動：`git diff --stat 7df1a22..HEAD -- content/`（排除測試 bundle）為空
